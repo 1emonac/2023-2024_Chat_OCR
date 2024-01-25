@@ -1,0 +1,19 @@
+<html>
+    <head>
+        <title>Photo App</title>
+    </head>
+    <body>
+        <h1><a href="{%url 'photo_list'%} ">홈으로 돌아가기</a></h1>
+        <section>
+            <div>
+                <h2>New Photo</h2>
+                <form method="POST">
+                    {%csrf_token%} {{form.as_p}}
+                    <button type="submit">완료!</button>
+                </form>
+            </div>
+        </section>
+    </body>
+</html>
+
+<!-- 주석입니다 -->
