@@ -1,0 +1,21 @@
+css - 모든 페이지
+style 태그 - 특정페이지
+style 속성 - 특정태그
+
+template
+- Django가 브라우저에 보낼 문서의 형탤르 미리 만들어 놓은 것
+
+HTML(Hyper Text Markup Language)
+
+태그의 종류
+- 열고 닫는 형태 : 태그 사이에 다른 태그나 내용을 넣을 수 있음
+	- 예) <div>내용</div>
+
+- 단독 형태 : 태그 사이에 넣을 수 없음
+	- 예) <img src = "이미지 주소">
+
+* 자주 사용하게 되는 태그들
+- div 태그 : 특별한 의미를 갖지 않음. 문서의 영역을 수평으로 나눌 때 사용(division)
+- p 태그 : 문장(paragraph)을 나타낼 때 사용
+- img 태그 : 이미지를 첨부할 때 사용
+- ol, ui, li 태그 : 리스트(ordered list, unordered list)와 리스트 아이템(li)
