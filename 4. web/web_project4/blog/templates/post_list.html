@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <body>
+        <ul>
+             {% for list in postlist %}
+                <li>
+                    <h2>{{ list.title }}</h2>
+                    <p>{{ list.content }}</p>
+                    <!-- post와 연결된 모든 comment QuerySet -->
+                    <ul>
+                        {% for comment in post.comment_set.all %}
+                            <li>{{comment.content}}</li>
+                        {% empty %}
+                            <li>아직 댓글이 없습니다</li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% endfor %}
+        </ul>
+    </body>
+</html>
