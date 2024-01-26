@@ -1,0 +1,559 @@
+★ < myweb 폴더 - setting.py >
+INSTALLED_APPS = 우리가 사용할 앱들
+"photo",  (추가)
+
+TIME_ZONE = "Asia/Seoul"
+-- (저장하기, Ctrl + S)
+
+★ < Terminal >
+>> python manage.py migrate -- -(마이그레이션 적용)
+>> python manage.py runserver -- (파이썬 서버 돌리기)
+
+(터미널 돌아가고 있는 코드 강제 종료 키 : Ctrl + C)
+
+★ < dbever >
+sqlite3 새롭게 만들기
+path : project - web - web_project1 - db.sqlite3 (open하기)
+-- Test 먼저 해서 다운로드 먼저 진행한 후에 확인버튼 누르기
+
+★ < 크롬 검색창 >
+-- Django administration
+http://127.0.0.1:8000/admin/
+-- (아이디와 비밀번호 생성은 코드를 쳐서 생성)
+
+★ < Terminal >
+>> python manage.py createsuperuser  - (파이썬 관리자 계정 만들기)
+>> Username (leave blank to use 'itsc'): itsc
+>> Email address:  (그냥 본인 이메일 넣기)
+>> Password: (비번은 쳐도 안 보임)
+>> Password (again): (비번은 쳐도 안 보임)
+# This password is too short. It must contain at least 8 characters.
+# This password is too common.
+# This password is entirely numeric.
+>> Bypass password validation and create user anyway? [y/N]: y
+Superuser created successfully.
+
+-- ★ 생성하고 나면 dbeaver - db.sqlite3 - 테이블 - auth_user에 추가된 것을 확인할 수 있음
+
+★ < 크롬 페이지 > 
+-- 이제 크롬 페이지에 아이디와 비밀번호 입력하면 로그인이 되는 것을 볼 수 있음
+
+★ < Terminal >
+>> python manage.py runserver
+
+★ < photo(=app)폴더의 models.py >
+(# Create your models here.)
+class Photo(models.Model):
+    title = models.CharField(max_length = 50)
+    author = models.CharField(max_length = 50)
+    image = models.CharField(max_length = 200)
+    description = models.TextField()
+    price = models.IntegerField()
+-- (저장하기, Ctrl + S)
+
+-- (Ctrl + C, 돌아가고 있는 서버 먼저 종료 시키기)
+★ < Terminal >
+>> python manage.py makemigrations
+>> python manage.py migrate
+
+★ < dbeaver > 
+db.sqlite3 - 테이블 새로고침 - 마지막에 photo_phto 테이블이 추가된 것을 확인할 수 있음
+--(우리가 따로 프라이머리 키를 지정하지 않는다면 db에서는 id라는 컬럼을 자체적으로 만들고 primary key를 만든다)
+
+★ < Terminal >
+>> python manage.py runserver
+-(관리자 페이지에 들어가기 위해서는 서버를 작동시켜야함)
+
+★ < photo(=app)폴더의 admin.py >
+(from django.contrib import admin)
+from .models import Photo
+
+(# Register your models here.)
+admin.site.register(Photo) # photo모델을 어드민 페이지에 등록
+
+★ < 크롬 페이지 > 
+-- 새로고침을 하면 관리자 페이지에 Photo에 pthotos라는 항목이 생성되는 것을 볼 수 있음
+photos > add
+- title : 푸른 언덕
+- Author : 마이크로소프트
+- Image : https://wallpapercave.com/wp/wp2754864.jpg
+- Description : 윈도우 기본 바탕화면
+- Pricce : 1000
+-- Save
+
+★ < dbeaver >
+-- db.sqlite3 새로고침 - photo_photo 테이블에 데이터가 들어간 것을 확인
+
+★ < photo(=app)폴더 >
+new folder 생성 - templates
+templates 폴더 안에 - photo 폴더 생성
+photo 폴더 안에 - photo_list.html 생성
+
+<html>
+    <head>
+        <title> Photo App</title>
+    </head>
+    
+    <body>
+        <h1><a herf=""> 사진 목록 페이지</a></h1>
+        <section>
+            <div>
+                <h2>
+                    <a href="">푸른 언덕</a>
+                </h2>
+                <img src="https://wallpapercave.com/wp/wp2754864.jpg" alt = "푸른언덕" width = "300" />
+                <p>마이크로소프트, 1000원</p>
+            </div>
+            <div>
+                <h2>
+                    <a href="">푸른 언덕2</a>
+                </h2>
+                <img src="https://wallpapercave.com/wp/wp2754864.jpg" alt = "푸른언덕" width = "300" /> 
+                <p>마이크로소프트, 1000원</p>
+            </div>
+        </section>
+    </body>
+</html>
+-- Ctrl + S
+-- Project\web\web_project1\photo\templates\photo에 가보면 photo_list.html을 확인할 수 있음
+
+★ < photo(=app)폴더 views.py >
+(# Create your views here.)
+def photo_list(request):
+    return render(request, "photo/photo_list.html", {})
+
+★ < photo(=app)폴더 >
+-- urls.py 파일 만들기
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path("", views.photo_list, name="photo_list"),
+]
+
+★ < myweb 폴더 - urls.py >
+from django.contrib import admin
+from django.urls import path, >>include
+
+urlpatterns = [
+    path("admin/", admin.site.urls),
+>>    path("", include("photo.urls")),
+]
+
+-- 계속 save 잘 하기!
+
+★ < 크롬 페이지 > 
+http://127.0.0.1:8000/ - 하면, 푸른 언덕 사진 2장을 볼 수 있음
+
+★ < photo(=app)폴더 - photo_list.html >
+<html>
+    <head>
+        <title> Photo App</title>
+    </head>
+    
+    <body>
+        <h1><a herf=""> 사진 목록 페이지</a></h1>
+        <section>
+            {% for photo in photos %}
+            <div>
+                <h2>
+                    <a href="">{{photo.title}}</a>
+                </h2>
+                <img src="{{photo.image}}" alt = "{{photo.title}}" width = "300" />
+                <p>{{photo.author}}, {{photo.price}}원</p>
+            </div>
+            {% endfor %}
+        </section>
+    </body>
+</html>
+
+★ < photo(=app)폴더 - views.py >
+from django.shortcuts import render
+from .models import Photo
+
+# Create your views here.
+def photo_list(request):
+    photos = Photo.objects.all()
+    return render(request, "photo/photo_list.html", {"photos" : photos})
+
+~~ 뭐든 파일을 생성하고, 수정하고 저장하고 삭제하고 나면 저장하고 서버가 한 번 돌아가는지 확인하고 다음 단계를 진행해야 한다 ~~
+
+★ < 크롬 페이지 >
+http://127.0.0.1:8000/admin/photo/photo/
+-- 사진 2장 업로드 해 보기
+http://127.0.0.1:8000/ -- (새로고침 하면 사진 3장이 보여야함)
+
+★ < photo(=app)폴더 - templates - photo폴더 - photo_detail.html 파일 생성 >
+<html>
+    <head>
+        <title>
+            Photo App
+        </title>
+    </head>
+    <body>
+        <h1>{{photo.title}}</h1>
+        <section>
+            <div>
+                <img src = "{{photo.image}}" alt = "{{photo.title}}" width = "300" />
+                <p>{{photo.description}}</p>
+                <p>{{photo.author}}, {{photo.price}}원</p>
+            </div>
+        </section>
+    </body>
+</html>
+
+★ < photo(=app)폴더 - views.py >
+from django.shortcuts import render, >> get_object_or_404
+from .models import Photo
+
+# Create your views here.
+def photo_list(request):
+    photos = Photo.objects.all()
+    return render(request, "photo/photo_list.html", {"photos" : photos})
+
+>> def photo_detail(request, pk):
+          photo = get_object_or_404(Photo, pk = pk)
+          return render(request, "photo/photo_detail.html", {"photo" : photo})
+
+★ < photo(=app)폴더 - urls.py >
+from django.urls import path
+from . import views
+
+urlpatterns = [
+        path("", views.photo_list, name="photo_list"),
+>>    path("photo/<int:pk>/", views.photo_detail, name="photo_detail"),
+]
+
+★ < photo_list.html >
+<html>
+    <head>
+        <title> Photo App</title>
+    </head>
+    
+    <body>
+        <h1><a herf=""> 사진 목록 페이지</a></h1>
+        <section>
+            {% for photo in photos %}
+            <div>
+                <h2>
+>>                    <a href="{%url 'photo_detail' pk=photo.pk %}">{{photo.title}}</a>
+                </h2>
+                <img src="{{photo.image}}" alt = "{{photo.title}}" width = "300" />
+                <p>{{photo.author}}, {{photo.price}}원</p>
+            </div>
+            {% endfor %}
+        </section>
+    </body>
+</html>
+
+★ < photo(=app)폴더 - templates - photo폴더 - photo_post.html 파일 생성 >
+<html>
+    <head>
+        <title>Photo App</title>
+    </head>
+    <body>
+        <h1><a href="">홈으로 돌아가기</a></h1>
+        <section>
+            <div>
+                <h2>New Photo</h2>
+                <form method="POST">
+                    {%csrf_token%} {{form.as_p}}
+                    <button type="submit">완료!</button>
+                </form>
+            </div>
+        </section>
+    </body>
+</html>
+
+★ < photo(=app)폴더 - forms.py >
+from django import forms
+from .models import Photo
+
+class PhotoForm(forms.ModelForm):
+    class Meta:
+        model = Photo
+        fields = (
+            "title",
+            "author",
+            "image",
+            "description",
+            "price",
+        )
+
+★ < photo(=app)폴더 - views.py >
+from django.shortcuts import render, get_object_or_404, >> redirect
+from .models import Photo
+>> from .forms import PhotoForm
+
+# Create your views here.
+def photo_list(request):
+    photos = Photo.objects.all()
+    return render(request, "photo/photo_list.html", {"photos" : photos})
+
+def photo_detail(request, pk):
+    photo = get_object_or_404(Photo, pk = pk)
+    return render(request, "photo/photo_detail.html", {"photo" : photo})
+
+>> def photo_post(request):
+    if request.method == "POST":
+        form = PhotoForm(request.POST)
+        if form.is_valid():
+            photo = form.save(commit=False)
+            photo.save()
+            return redirect("photo_detail", pk=photo.pk)
+    else:
+        form = PhotoForm()
+    return render(request, "photo/photo_post.html", {"form" : form})
+
+★ < photo(=app)폴더 - urls.py >
+urlpatterns = [
+    path("", views.photo_list, name="photo_list"),
+    path("photo/<int:pk>/", views.photo_detail, name="photo_detail"),
+>>    path("phhoto/new/", views.photo_post, name="photo_post"),
+]
+
+★ < 크롬 페이지 >
+http://127.0.0.1:8000/photo/new/ 쳐서 활성화 되는지 확인!
+-- 데이터 넣어서 잘 나오는지 확인해 보기 ~_~
+
+--페이지수정 문제--
+★ < photo(=app)폴더 - templates - photo - photo_list.html >
+<html>
+    <head>
+        <title> Photo App</title>
+    </head>
+    
+    <body>
+        <h1><a herf=""> 사진 목록 페이지</a></h1>
+        <h1><a href="{%url 'photo_post'%}">New Photo</a></h1>
+        <section>
+            {% for photo in photos %}
+            <div>
+                <h2>
+                    <a href="{%url 'photo_detail' pk=photo.pk %}">{{photo.title}}</a>
+                </h2>
+                <img src="{{photo.image}}" alt = "{{photo.title}}" width = "300" />
+                <p>{{photo.author}}, {{photo.price}}원</p>
+            </div>
+            {% endfor %}
+        </section>
+    </body>
+</html>
+
+★ < photo(=app)폴더 - templates - photo - photo_post.html >
+<html>
+    <head>
+        <title>Photo App</title>
+    </head>
+    <body>
+        <h1><a href="{%url 'photo_list'%} ">홈으로 돌아가기</a></h1>
+        <section>
+            <div>
+                <h2>New Photo</h2>
+                <form method="POST">
+                    {%csrf_token%} {{form.as_p}}
+                    <button type="submit">완료!</button>
+                </form>
+            </div>
+        </section>
+    </body>
+</html>
+
+★ < photo(=app)폴더 - views.py >
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Photo
+from .forms import PhotoForm
+
+# Create your views here.
+def photo_list(request):
+    photos = Photo.objects.all()
+    return render(request, "photo/photo_list.html", {"photos" : photos})
+
+def photo_detail(request, pk):
+    photo = get_object_or_404(Photo, pk = pk)
+    return render(request, "photo/photo_detail.html", {"photo" : photo})
+
+def photo_post(request):
+    if request.method == "POST":
+        form = PhotoForm(request.POST)
+        if form.is_valid():
+            photo = form.save(commit=False)
+            photo.save()
+            return redirect("photo_detail", pk=photo.pk)
+    else:
+        form = PhotoForm()
+    return render(request, "photo/photo_post.html", {"form" : form})
+
+>> def photo_edit(request, pk):
+    photo = get_object_or_404(Photo, pk=pk)
+    if request.method == "POST":
+        form = PhotoForm(request.POST, instance=photo)
+        if form.is_valid():
+            photo = form.save(commit=False)
+            photo.save()
+            return redirect("photo_detail", pk=photo.pk)
+    else:
+        form = PhotoForm(instance=photo)
+    return render(request, "photo/photo_post.html", {"form" : form})
+
+★ < photo(=app)폴더 - urls.py >
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path("", views.photo_list, name="photo_list"),
+    path("photo/<int:pk>/", views.photo_detail, name="photo_detail"),
+    path("photo/new/", views.photo_post, name="photo_post"),
+>>    path("photo/<int:pk>/edit/", views.photo_edit, name = "photo_edit"),
+]
+
+★ < photo(=app)폴더 - photo_detail.html > -- (페이지 수정 코드)
+<html>
+    <head>
+        <title>
+            Photo App
+        </title>
+    </head>
+    <body>
+        <h1>{{photo.title}}</h1>
+        <h3><a href="{% url 'photo_edit' pk=photo.pk%}">Edit Photo</a></h3>
+        <section>
+            <div>
+                <img src = "{{photo.image}}" alt = "{{photo.title}}" width = "300" />
+                <p>{{photo.description}}</p>
+                <p>{{photo.author}}, {{photo.price}}원</p>
+            </div>
+        </section>
+    </body>
+</html>
+
+★ < photo(=app)폴더 - photo_detail.html > -- (페이지 삭제 코드)
+<html>
+    <head>
+        <title>
+            Photo App
+        </title>
+    </head>
+    <body>
+        <h1>{{photo.title}}</h1>
+        <h3><a href="{% url 'photo_edit' pk=photo.pk%}">Edit Photo</a></h3>
+        <h3><a href="{% url 'photo_delete' pk=photo.pk%}">Delete Photo</a></h3>
+        <section>
+            <div>
+                <img src = "{{photo.image}}" alt = "{{photo.title}}" width = "300" />
+                <p>{{photo.description}}</p>
+                <p>{{photo.author}}, {{photo.price}}원</p>
+            </div>
+        </section>
+    </body>
+</html>
+
+★ < photo(=app)폴더 - views.py >
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Photo
+from .forms import PhotoForm
+
+# Create your views here.
+def photo_list(request):
+    photos = Photo.objects.all()
+    return render(request, "photo/photo_list.html", {"photos" : photos})
+
+def photo_detail(request, pk):
+    photo = get_object_or_404(Photo, pk = pk)
+    return render(request, "photo/photo_detail.html", {"photo" : photo})
+
+def photo_post(request):
+    if request.method == "POST":
+        form = PhotoForm(request.POST)
+        if form.is_valid():
+            photo = form.save(commit=False)
+            photo.save()
+            return redirect("photo_detail", pk=photo.pk)
+    else:
+        form = PhotoForm()
+    return render(request, "photo/photo_post.html", {"form" : form})
+
+def photo_edit(request, pk):
+    photo = get_object_or_404(Photo, pk=pk)
+    if request.method == "POST":
+        form = PhotoForm(request.POST, instance=photo)
+        if form.is_valid():
+            photo = form.save(commit=False)
+            photo.save()
+            return redirect("photo_detail", pk=photo.pk)
+    else:
+        form = PhotoForm(instance=photo)
+    return render(request, "photo/photo_post.html", {"form" : form})
+
+>> def photo_delete(request, pk):
+    photo = get_object_or_404(Photo, pk=pk)
+    photo.delete()
+    return redirect("photo_list")
+
+★ < photo(=app)폴더 - urls.py >
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path("", views.photo_list, name="photo_list"),
+    path("photo/<int:pk>/", views.photo_detail, name="photo_detail"),
+    path("photo/new/", views.photo_post, name="photo_post"),
+    path("photo/<int:pk>/edit/", views.photo_edit, name = "photo_edit"),
+>>    path("photo/<int:pk>/delete/", views.photo_delete, name="photo_delete"),
+]
+
+! New 예제
+★ < File - Open Folder - 새폴더(web_project2) 생성 >
+★ <index.html> 생성
+★ <index.html> - ! + Enter 하고 저장
+
+<!DOCTYPE html>
+<html lang="en">
+    <head> <!-- head : 문서에 대한 기본적인 정보가 담기는 태그 -->
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>(본인 이름 쓰기)의 홈페이지</title> <!-- title : 브라우저 위(탭)에 나타나는 제목 -->
+    </head>
+    <body> <!-- body : 화면에 나타나는 내용을 담음 -->
+        <nav> <!-- nav : 웹사이트의 주요 페이지를 안내하는 네비게이션 역할을 만들 때 사용 -->
+            <!-- a : 해당 부분을 클릭하면 페이지가 이동하도록 만들고 싶을 때 사용. 넘어갈 링크는 href로 지정-->
+            <a href="./index.html">Home</a>
+            <a href="./blog_list.html">Blog</a>
+            <a href="./about_me.html">About me</a>
+        </nav>
+
+        <h1>첫 번째 크기 헤드라인</h1>
+        <h2>두 번째 크기 헤드라인</h2>
+        <h3>세 번째 크기 헤드라인</h3>
+        <h4>네 번째 크기 헤드라인</h4>
+        <h5>다섯 번째 크기 헤드라인</h5>
+        <p>문단은 p로 쓰기. Paragraph의 앞 글자를 따온 것</p>
+        <a href="https://google.com">Go to google</a>
+        <hr/> <!-- hr : 수평선을 그어주는 태그-->
+        <img src="https://wallpapercave.com/uwp/uwp4155700.jpeg" width = "600px">
+    </body>
+</html>
+
+★ <about_me.html> 생성
+★ ! + Enter 하고 저장
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About me</title>
+</head>
+<body>
+    <nav style = "background-color:darkcyan; font-size:150%; text-align: center;">
+        <!-- style속성을 추가하여 배경색은 darkcyan으로, 글자크기 150%, 텍스트는 가운데 정렬-->
+        <a href="./index.html" style="color:white">Home</a>
+        <a href="./blog_list.html" style="color:white">Blog</a>
+        <a href="./about_me.html" style="color:white">About me</a>
+    </nav>
+
+    <h1>About me</h1>
+    <h2>(본인 이름)입니다.</h2>
+    <p>HTML, CSS, Django로 웹 사이트를 만듭니다.</p>
+    <a href="index.html">첫 화면으로 가기</a>
+</body>
+</html>
