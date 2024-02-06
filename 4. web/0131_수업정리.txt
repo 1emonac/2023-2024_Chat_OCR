@@ -1,0 +1,81 @@
+authenticate
+- 주어진 값에 해당하는 사용자가 있는지 판단
+- username과 password에 해당하는 사용자가 있다면 함수의 실행 결과로
+  User 인스턴스가 반환되며, 없다면 반환되지 않음
+
+>> shell
+>> from django.contrib.auth import authenticate
+>> user = authenticate(username="a", password="a")
+>> print(user)
+     >> None
+>> user = authenticate(username="itsc", password="0000")
+>> print(user)
+     >> itsc
+
+- authenticate 함수의 실행 결과가 User 객체라면 입력한 값(credentials; 자격증명)에 해당하는 사용자가 리턴
+
+login
+- 브라우저에 해당 사용자를 유지시켜주는 기능
+- authenticate 가 단순히 입력한 username/password에 해당하는 사용자가 있는지 검사하고 User 객체를 되돌려준다면, login 함수는 우리가 웹사이트에 로그인 했다면 기대하는 로그인 상태로 변환 및 유지 기능을 담당
+--- login 함수 호출에는 현재 요청 (request) 객체와 사용자(User)객체가 필요
+
+
+로그아웃 구현 및 로그인 개선
+- 로그아웃은 로그인과 달리 입력값을 받지 않으므로 Template 없이 View 만으로 구현할 수 있음
+
+- 로그아웃 기본 구조
+--- View : logout_view
+--- URL: 127.0.0.1:8000/users/logout/
+--- Template : 없음
+
+회원가입
+- 회원가입은 Post 객체를 만드는 글쓰기와 유사하게 입력받은 정보로 User 객체를 만드는 작업
+--- 다만, User 객체는 다른 일반적인 Model 클래스와는 다른 특징들을 갖고 있어, 몇 가지 더 고랴할 사항들이 있음
+
+- 회원가입 기본 구조
+--- View : signup
+--- URL : 127.0.0.1:8000/users/signup/
+--- Template : templates/users/signup.html
+
+- Django는 User의 비밀번호를 변형해서 저장함
+--- 사용자가 입력한 비밀번호를 암호화하지 않고 DB에 저장하는 것은 보안에도 문제가 있고, 대한 민국 개인정보 보호법 위반
+
+- Django의 User 모델에는 비밀번호를 변형해서 저장하는 기능이 내장되어 있음
+--- 사용자 정보는 create_user() 메서드를 사용해야함
+
+User 생성하기
+- User를 생성할 때는 몇 가지 고려해야 할 사항이 있음
+	1, 비밀번호와 비밀번호 확인의 값이 같아야 함
+	2. 같은 사용자 명을 사용하는 User는 생성 불가 및 오류 전달
+
+SignupForm 내부에서 데이터 유효성 검사
+- Form 클래스는 기본적으로 탑재된 유효성 검사 외에 추가적인 검사를 하도록 커스터마이징 할 수 있음
+--- 회원가입 시 입력 받는 데이터는 username과 password1, password2. 이 데이터에 대한 데이터 검증이 필요
+
+- 하나의 필드에 대한 유효성 검사는 clean_{필드명} 메서드가 담당
+- Form에 전달된 전체 data에 대한 유효성 검사는 clean 메서드가 담당
+--- 예) 하나의 필드인 username은 clean_username 메서드에 검증 로직을 작성
+--- 예) 비밀번호는 두 개의 필드 냉ㅇ을 동시에 사용해야 하므로(password1, password2) 하나의 필드 데이터만 가지고 검증 할 수 없음. 이 때는 전체 데이터를 사용할 수 있는 clean 메서드를 사용
+
+- clean_username은 SignupForm에 전달된 username 키에 해당하는 값을 검증할 때 사용됨
+--- 검증하려는 필드 데이터에 접근할 때는 self.cleaned_data["필드명"]에서 값을 가져옴
+--- 이 값을 사용할 수 있다면 함수에서 return 해주고, 유효하지 않다면 ValidationError를 발생시킴
+--- clean_username에서 ValidationError를 발생시키는 것은 Form.add_error("username", {입력한 에러메시지}) 를 호출하는 것과 같음
+
+- 두 개 이상의 필드 값을 동시에 비교해야 할 때는 전체 데이터 검증을 수행하는 clean 메서드 내부에 로직을 구현
+- clean_{필드명} 메서드와는 달리, clean 메서드는 마지막에 값을 리턴하지 않아도 됨
+
+Template을 확장하는 {% extneds %} 태그
+- {% extneds "템플릿 경로" %} 태그는 입력한 경로의 template을 기반으로 새 Template을 생성
+
+- 공통되는 부분은 남겨두고, Template마다 변경되는 부분은 {% block content %}{% endblock %}으로 치환
+--- {% block %} 영역은 이 Template을 확장하는 하위 템플릿에서 변경 가능한 부분
+--- base.html에는 하나의 block 밖에 없으므로, base.html을 확장(extends)하는 하위 Template들은 content block 내의 영역만 편집 가능하며 나머지 부분은 base.html의 변경사항을 따라가게 됨
+
+- content block 내부를 채우려면 {% block content%}로 블록 영역이 시작함을 알리고 {% endblock %}으로 영역이 끝났음을 선언해주어야 함
+
+구글 검색 'django admin thumbnails'
+
+
+
+

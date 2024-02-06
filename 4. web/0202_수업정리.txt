@@ -1,0 +1,82 @@
+<!-- 사용자들이 다시 우리에게 전달할 수 있게 사용하는 것이 form -->
+<!-- POST = 데이터를 쌓아주세요, 데이터를 수정해 주세요~ 의 약속 -->
+<!-- POST 가 나오면 따라서 {% csrf_token %}이 나온당 -->
+<!-- form이란 데이터를 받을게 > 중괄호 사용 > as_p = p라는 태그로 받을게 -->
+
+Post를 만들기 위해서는 내용 뿐 아니라 이미지 파일들도 필요
+이미지 파일을 저장하는 필드는 Post 모델이 아닌 PostImage 모델에 있음
+
+ModelForm은 기본적으로 class Meta 속성에 정의한 하나의 모델만을 생성할 수 있음
+- 이미지 파일 여러 장을 추가로 받아 처리하는 기능은 가지고 있지 않음
+- 여러 장의 이미지를 업로드해서 PostImage 객체를 여러 개 생성하는 기능을 PostForm과는 별도로 구성
+
+파일을 첨부하기 위해 <input>의 type 속성을file로 선언
+- 여러 개의 파일을 첨부하기 위해서는 multiple 속성이 추가로 선언되어야 함
+--- multiple 속성은 선언만 하면 되며 따로 값을 지정하지는 않음
+파일을 첨부할 것이므로 form의 enctype을 multipart/form-data로 지정
+
+lable에 있는 for 속성은 이 lable이 어떤 input에 대한 설명인지를 지정하는 역할
+- 값을 가리키는 input의 id 속성 값을 지정해야함
+
+View에서 multiple 속성을 가진 file input 데이터 받기
+- Template의 images 와 content 중 content는 PostForm으로 전달하고 images로 전달된 여러 개의 파일을 별도로 처리해야 함
+- multiple 속성으로 전달한 여러 개의 파일 데이터는 request.FILES 대신 request.FILES.getlist("<전달된 input의 'name'속성>")으로 가져옴
+
+
+동적  URL
+URL 경로를 변경할 때 생기는 중복작업
+- 프로젝트가 복잡해질수록 한 URL을 여러 곳에서 사용할 것이고, 변경할 부분이 많음
+--- URLconf에 있는 URL 값이 변경되었을 때 자동으로 변경된 내용을 반영할 수 있다면 관리가 쉬워짐
+--- Django에서는 이를 위해 동적 URL을 사용할 수 있는 기능을 제공함
+
+동적 URL 생성을 위한 요소 추가
+- 동적으로 URL을 생성해서 사용하기 위해서는 app 별로 분리된 하위 urls.py에 app_name이라는 속성이 필요
+
+
+Template을 위한 {% url %} 태그
+- {% 'URL pattern name' %} 태그는 Template에서 urls.py의 내용을 이용해 동적으로 URL을 생성해줌
+--- URL pattern name은 {urls.py에 있는 app_name}:{path()에 지정된 name}의 구조
+
+
+{% url 'posts:comment_delete' comment_id=comment.id %}
+- URL pattern name이 posts:comment_delete로, app_name이 posts인 urls.py에서 name이 comment_delete인 URL을 동적으로 생성하겠다는 의미
+--- 이 경로는 <int:comment_id> 부분의 값을 URL을 통해 동적으로 입력 받음
+--- 그러므로 이 path()를 사용해서 URL 경로를 만드려면 동적으로 입력받는 부분인 comment_id 값이 필요함
+
+
+View의 동적 URL 변경
+- template 에서 {% url %} 태그를 사용하듯, View에서는 reverse 함수로 동적 URL을 생성
+
+다대다 관계 모델
+- 다대일(Many-to-one, N:1)관계는 한 테이블의 한 레코드가 다른 테이블의 여러 레코드와 연관됨을 나타냄
+- 다대다(Many-to-many, N:N)관계는 한 테이블의 여러 레코드가 다른 테이블의 여러 레코드와 연관되는 관계
+- 다대다 관계는 두 테이블의 연결을 정의하는 또 하나의 테이블이 필요
+
+- Post 모델에서 다대다를 선언하거나, HashTag 모델에서 다대다를 선언하거나 어느 쪽이든 중간에 테이블이 하나 만들어진다는 결과는 같음
+--- 하지만 관계에서 어느 쪽이 좀 더 다른 쪽을 포함하는지에 따라 다대다를 선언하는 모델이 달라짐
+----- 둘 중에서 좀 더 타당하게 느껴지는 쪽을 다대다를 선언하는 모델로 정함
+------- 글(Post)에 해시태그 여러 개를 포함하기
+------- 해시태그(HashTag)에 글 여러 개를 포함하기
+
+
+관리자페이지에서 여러 해시태그를 고를 수 있지만 체크박스 형태의 UI보다 불편
+- admin에 formfield_overrides 옵션을 추가하면 선택할 항목을 checkbox로 표시할 수 있음]
+
+
+Post 모델에 tags 라는 이름의 ManyToManyField를 선언했음
+- post.tags.all() 로 연결된 전체 HashTag 객체를 불러올 수 있음
+
+
+해시태그 검색 기본 구조
+- View : posts/views.py -> tags 함수
+- URL : 127.0.0.1:8000/posts/tags/{tag의 name}/
+- Templates : templates/posts/tags.html
+
+
+해시태그 생성
+- 모델에 정의된 ManyToManyField에 HashTag를 추가할 때는 add 함수를 사용
+
+
+get_or_create(): 인수로 전달하는 값에 해당하는 객체가 이미 존재한다면 DB의 내용을 가져오고, 없다면 새로 DB에 생성
+- get_or_create()의 결과는 2개의 아이템을 가진 튜플로 반환
+--- {DB에서 가져오거나 생성된 객체}, {생성 여부} = Model.objects.get_or_create()

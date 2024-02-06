@@ -1,0 +1,115 @@
+글 상세 페이지
+
+기본 구조
+- View: posts/views.py -> post_detail
+- URL: 127.0.0.1:8000/posts/<post_id>/
+- Template : templates/posts/post_detail.html
+
+Template 재사용
+{% include %} 태그로 <article> 태그를 재사용
+
+글 작성 후 이동할 위치 지정
+- 기존의 댓글 작성 후 redirect 로직
+--- 댓글 작성 완료 후 피드 페이지로 이동하라는 응답을 반환
+--- 댓글은 피드 페이지와 글 상세 페이지 양쪽에서 작성할 수 있으므로 각각의 경우에 따라 다르게 지정
+
+{% include %} 태그의 with 옵션
+- 각각의 글을 나타내는 HTML 요소는 {% include 'post.html' %}로 가져오고 있으며 댓글을 작성하는 CommentForm은 post.html Template 내에서 사용하고 있음
+- post.html을 include로 가져오면서 댓글 작성 후 이동할 URL 값을 전달해야함
+
+{% 태그명 as 변수명 %} : 태그로 만들어진 결과 값을 Template 내에서 사용할 변수에 할당
+- {% url 'post:post_detail' post.id as action_redirect_to %} 는 post.id의 상세 페이지 URL이 action_redirect_to 변수에 할당
+--- action_redirect_to 변수에 할당된 상세 페이지 URL은 댓글 작성이 완료된 후 브라우저에서 이동해야 할 주소
+
+
+{% include 'Template 명' with 변수명=값 %} : include로 가져올 Template에 변수명으로 값을 전달
+- {% include 'posts/post.html' with action_redirect_url=action_redirect_to %} 는 post.html Template을 렌더 할 때, action_redirect_url 이라는 변수를 추가적으로 사용 할 수 있게됨
+
+
+Template 중복코드 제거
+- 각 화면 단위 기능의 기반이 되는 레이아웃은 3가지
+--- 상단 내비게이션 바가 없는 레이아웃 : base.html
+--- 내이비게이션 바가 있는 레이아웃 : base_nav.html
+--- 내비게이션 바가 있으며, 이미지 슬라이더 기능이 포함된 레이아웃 : base_slider.html
+
+
+좋아요 기능
+- 좋아요 기능은 해시태그와 같은 다대다 관계를 사용
+- 해시태그는 글 생성 시 입력한 문자열을 쉼표 단위로 구분해서 생성했지만, 좋아요는 form과 button으로 구성해서 언제든 추가/삭제할 수 있는 토글방식으로 구현
+
+좋아요 모델, 관리자 페이지 구성
+- 좋아요 기능은 해시태그와 같은 M2M DB 구조를 사용
+- 사용자가 좋아요를 누른 Post와 Post에 좋아요를 누른 사용자들의 관계는 사용자의 좋아요 액션으로 만들어짐
+--- 사용자 쪽이 주도적이므로 User 모델에 like_posts로 ManyToManyFiemd를 정의하고, 좋아요 기능을 구현
+
+필드에 정의한 related_name 속성은 역방향으로 Model을 참조할 때 사용하는 이름
+- User 입장에서는 좋아요 한 목록을 user.like_posts.all()로 불러올 수 있으며
+- 반대로 Post 입장에서는 자신에게 좋아요를 누른 User 목록을 post.like_users_all()로 불러올 수 있음
+
+만약 related_name을 별도로 지정하지 않으면 {모델명의 소문자}_set으로 지정됨
+- post.user_set이라는 이름은 어떤 조건의 User 들과 연결된 것인지 알 수 없으므로 의미를 명확하게 나타내기 위해 related_name을 별도로 지정
+
+
+좋아요 처리는 토글(toggle) 방식을 사용
+- 이미 좋아요를 누른 상태라면 해제
+- 그렇지 않다면 좋아요 상태로 만듦
+- ManyToMany 연결을 제거하거나 추가하는 방식으로 구현할 수 있음
+
+- 사용자가 좋아요를 누른 Post 목록에 좋아요 요청이 전달된 Post가 포함되어있는지 판단하고
+--- 이미 존재한다면 연결을 삭제
+--- ManyToManyField의 remove 메서드로 연결을 삭제할 수 있음
+
+- 반대로 전달된 Post가 이미 좋아요를 누른 목록에 속하지 않는다면
+--- add로 새로운 연결을 생성
+
+- 생성이든 삭제든 로직이 실행된 후에는 댓글 작성 때와 같이 next로 전달된 URL로 되돌아감
+
+
+form의 action 주소는 방금 생성한 post_like View 함수로 연결되게 하며, DB 데이터를 변경하므로 method는 POST 방식을 사용'
+
+csrf_token을 제외하면 form 내부에 아무런 input이 없음
+-  Post의 좋아요 토글 기능에는 특별히 전달할 데이터가 없고
+- 이런 경우 내부 요소없이 단순히 POST 요청만을 전달
+
+{% if user in post.like_users.all %} 태그로 이 Post에 좋아요를 누른 모든 User 목록에 현재 로그인한 유저가 포함되는지 판단
+- 좋아요를 누른 상태라면 button 태그의 style 속성에 color: red; 값을 지정해 글자를 빨간색으로 바꾸어 사용자가 이 Post에 좋아요를 한 상태임을 표시
+
+
+팔로우/팔로잉 기능
+- 팔로우/팔로잉 관계는 해시태그, 좋아요와 같이 ManyToManyField를 사용해 다대다 관계로 구성되나 이들과는 다른 점이 있음
+- 해시태그와 좋아요는 한 쪽에서의 연결은 반대쪽에서의 연결도 나타나는 대칭적(Symmetrical)인 관계
+- 팔로우/팔로잉 관계는 한쪽에서의 연결과 반대쪽에서의 연결이 별도로 구분되는 비대칭적인 관계
+
+
+프로필 페이지
+- 프로필 페이지 기본 구조
+--- 자신의 정보, 작성한 글, 팔로우/팔로잉 수를 보여줄 페이지
+--- View: users/views.py -> profile
+--- URL : 127.0.0.1:8000/users/<int:user_id>/profile/
+--- Template : templates/users/profile.html
+
+base_profile.html 구성
+- 프로필 페이지에서는 사용자 정보와 사용자의 Post 목록을 표시
+- 프로필 페이지의 사용자 정보는 재사용하고
+- Post 목록 대신 팔로우/팔로잉 목록을 사용할 수 있도록 
+- 상단 사용자 정보를 공통으로 사용하는 기반 Template인 base_profile.html을 구성
+
+
+팔로우/팔로잉 목록
+- 자신을 팔로우하는 사용자 목록
+--- View: users/views.py -> followers
+--- URL : /users/<int:user_id>/followers/
+--- Template : templates/users/followers.html
+
+- 자신이 팔로우하는 사용자 목록
+--- View: users/views.py -> following
+--- URL : /users/<int:user_id>/following/
+--- Template : templates/users/following.html
+
+
+
+
+
+
+
+
