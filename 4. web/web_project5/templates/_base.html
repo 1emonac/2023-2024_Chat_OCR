@@ -1,0 +1,12 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <link rel="stylesheet" href="{% static 'css/pystagram_style.css' %}">
+        <title>Pystagram</title> <!-- 크롬 상단에 뜰 내용 -->
+        {% block head %}{% endblock %}
+    </head>
+    <body>
+        {% block base_content %}{% endblock %}
+    </body>
+</html>
