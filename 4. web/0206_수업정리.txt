@@ -1,0 +1,10 @@
+팔로우 토글 View
+- Post의 좋아요 기능과 같이 이미 팔로우 되어 있다면 언팔로우를
+- 팔로우 되어 있지 않다면 팔로우 목록에 추가하는 토글 기능을 사용
+--- View : users/views.py -> follow
+--- URL : /users/<int:user_id>/follow/
+--- Template : 없음
+
+
+method = post
+{% csrf_token %}

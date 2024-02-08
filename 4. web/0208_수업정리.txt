@@ -1,0 +1,4 @@
+models > views 로 가져올 때
+Post.objects.all      > 다 가져왕
+               .get     > 하나만 가져와
+               .fillter   > 몇 개만 가져왕 (필터링)
