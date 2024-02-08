@@ -309,7 +309,7 @@ def photo_detail(request, pk):
 urlpatterns = [
     path("", views.photo_list, name="photo_list"),
     path("photo/<int:pk>/", views.photo_detail, name="photo_detail"),
->>    path("phhoto/new/", views.photo_post, name="photo_post"),
+>>    path("photo/new/", views.photo_post, name="photo_post"),
 ]
 
 ★ < 크롬 페이지 >
