@@ -1,0 +1,19 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+        <title>{{ post.title }} - Blog</title>
+    </head>
+    <body>
+        <h1><a href="/blog/">Blog</a></h1>
+        <hr />
+        <div id="post-list">
+                <ul class="posts">
+                <h2>{{ post.title }}</h2>
+                <h4>{{ post.created_at }}</h4>
+                <p>{{ post.content }}</p>
+            </ul>
+        </div>
+    </body>
+</html>
