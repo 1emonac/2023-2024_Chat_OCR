@@ -1,0 +1,17 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <link rel="stylesheet" href="{% static 'css/pystagram_style.css' %}">
+        <title>Schedule Helper</title>
+        <nav class="navbar bg-body-tertiary">
+            <div class="container-fluid">
+                <a class="navbar-brand"><h2>Schedule Helper</h2></a>
+            </div>
+        </nav>
+        {% block head %}{% endblock %}
+    </head>
+    <body>
+        {% block base_content %}{% endblock %}
+    </body>
+</html>

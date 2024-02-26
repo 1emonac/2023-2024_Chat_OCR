@@ -1,0 +1,164 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Schedule Helper</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
+        <link rel="stylesheet" type="text/css" href="{% static 'css/detail.css' %}" />
+    </head>
+
+    <body>
+        <main class="dashboard">
+            <nav class="dashboard-sidenav">
+              <h2><a href="{% url 'cal:calendar' %}" class="logo" >Schedule Helper</a></h2>
+            </nav>
+
+            <article class="dashboard-content">
+                <header class="welcome-banner">
+                  {% for i in post %}
+                    <h1>일정명 : {{ i.ename }}</h1>
+                    <h2>Today : {{ i.edate_s }}</h2>
+                    <h3><strong>일정내용 : {{i.edesc}}</strong></h3>
+                  {% empty %}
+                    <h1>일정이 없습니다</h1>
+                    <h2>Today : {{ today_date }}</h2>
+                  {% endfor %}
+                </header>
+
+                <section class="section">
+                    <div class="section-titles"></div>
+                    <ul class="monitor-list">
+                        <li class="monitor-list__item">
+                            <div class="monitor-data">
+                                <div class="monitor-type"><strong>🧥 오늘의 코디</strong></div>
+                            </div>
+                            <div class="monitor-gauge">
+                                (옷차림 추천)</a>
+                            </div>
+                        </li>
+                        
+                        <li class="monitor-list__item active">
+                            <div class="monitor-data2">
+                              <div class="monitor-type"><strong>🎵 Today's music</strong></div>
+                            </div>
+                            <div class="monitor-gauge">
+                            </div>
+                        </li>
+                    </ul>
+                </section>
+                
+                <section class="section">
+                    <div class="section-titles"></div>
+                      <div class="main__cards">
+                        <div class="card">
+                          <div class="card__header">
+                            <div class="card__header-title text-light"><strong>☀️ 오늘의 날씨 ☀️</strong></div>
+                          </div>
+    
+                          <div class="card__main">
+    
+                            {% for i in today_weather %}
+                                <div class="card__row">
+                                    <div class="card__icon"><i class="fas fa-heart"></i></div>
+                                    <div class="card__time">
+                                        <div></div>
+                                    </div>
+                                    <div class="card__detail">
+                                        <div class="card__description">{{i.information}}</div>
+                                        <div class="card__note">{{i.value}}</div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                            </div>
+                        </div>
+                      </div>
+                    </div>
+                  </section>                
+                </article>
+
+            <article class="dashboard-others">
+                <section class="section">
+                    <h2>⭐ 추천 리스트</h2>
+                    <div class="section-titles">
+                        <div class="section-title">🍽️ 맛집 추천</div>
+                    </div>
+                    <ul class="function-list">
+                      <li class="function-list__item" style="--function-color: var(--first==-cate-color);">
+                        <div class="function">
+                          <div class="function">
+                            <div class="text"><p><strong>한 식</strong></p></div>
+                          </div>
+                        </div>
+                        <div>
+                          {% for i in han %}
+                          <p style="font-size:12px">{{i.rank}}. {{i.title}}</p>
+                          {% endfor %}
+                        </div>
+                      </li>
+                      <li class="function-list__item" style="--function-color: var(--second-cate-color);">
+                          <div class="function">
+                              <div class="function">
+                                <div class="text"><p><strong>양 식</strong></p></div>
+                              </div>
+                          </div>
+                          <div>
+                            {% for i in yang %}
+                            <p style="font-size:12px">{{i.rank}}. {{i.title}}</p>
+                            {% endfor %}
+                          </div>
+                      </li>
+                      <li class="function-list__item" style="--function-color: var(--third-cate-color);">
+                        <div class="function">
+                          <div class="function">
+                            <div class="text"><p><strong>중 식</strong></p></div>
+                          </div>
+                        </div>
+                        <div>
+                        {% for i in joong %}
+                         <p style="font-size:12px">{{i.rank}}. {{i.title}}</p>
+                        {% endfor %}
+                        </div>
+                      </li>
+                      <li class="function-list__item" style="--function-color: var(--fourth-cate-color);">
+                        <div class="function">
+                          <div class="function">
+                            <div class="text"><p><strong>일 식</strong></p></div>
+                          </div>
+                        </div>
+                        <div>
+                        {% for i in ill %}
+                          <p style="font-size:12px">{{i.rank}}. {{i.title}}</p>
+                        {% endfor %}
+                        </div>
+                        <div class="function-data">
+                          <div class="function-name"></div>
+                        </div>
+                      </li>
+                    </ul>
+                </section>
+
+                <section class="section">
+                    <div class="section-titles">
+                        <div class="section-title">
+                            ✈️ 여행지 추천
+                        </div>
+                    </div>
+                    <div class="statistics">
+                        <div class="progress-data">
+                            <div class="progress-text">
+                              {% for i in travel %}
+                              <div class="progress-weekday" style="font-size:20px;"><strong>{{i.rank}}. {{ i.title }}</strong></div>
+                              <div class="progress-weekday" style="font-size:15px;">{{ i.address }}</div>
+                              {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </article>
+        </main>
+        <script src="{% static 'js/detial.js' %}"></script>
+    </body>
+</html>

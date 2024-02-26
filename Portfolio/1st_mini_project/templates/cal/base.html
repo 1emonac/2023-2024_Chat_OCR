@@ -1,0 +1,68 @@
+{% load static %}
+
+<!doctype html>
+<html lang="ko">
+  <head>
+    <nav class="navbar">
+      <script>
+        function showPrompt() {
+          // 사용자로부터 입력값 받기
+          var inputValue = prompt("시/군/구를 입력하세요:(ex. 서울시 강남구)");
+        }
+      </script>
+    
+    <div class="container-fluid">
+      <a class="navbar-brand"><h1>Schedule Helper</h1></a>
+      <form class="d-flex mt-3" role="search">
+        <ul>
+          <li id="detailLi" style="display: inline-block;">
+            <button id="detail" class="btn btn-primary" type="button"><a href="{% url 'cal:post_detail' %}">상세페이지</a></button>
+          </li>
+          {% if user.is_authenticated %}
+          <li style="display: inline-block; margin-left: 10px;">
+            <button onclick="showPrompt()" class="btn btn-primary">선호지역선택</button>
+          </li>
+          <li id="logoutButtonLi" style="display: inline-block;">
+            <button id="logoutButton" class="btn btn-primary" type="button"><a href="{% url 'users:logout' %}">로그아웃</a></button>
+            {% else %}
+          <li id="loginButtonLi" style="display: inline-block;">
+              <button id="loginButton" class="btn btn-primary" type="button"><a href="{% url 'users:login' %}">로그인/회원가입</a></button>
+          </li>
+          {% endif %}
+        </ul>
+      </form>
+    </div>
+    </nav>
+    
+      <!-- Required meta tags -->
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <!-- JS -->
+      <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.9.0/fullcalendar.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/air-datepicker/2.2.3/js/datepicker.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/air-datepicker/2.2.3/js/i18n/datepicker.en.js"></script>
+      
+      <!-- Bootstrap CSS -->
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+      <link rel="stylesheet" href="https://maxcdn.icons8.com/fonts/line-awesome/1.1/css/line-awesome-font-awesome.min.css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/air-datepicker/2.2.3/css/datepicker.css">
+      <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.10/css/all.css">
+      <!-- <link rel="stylesheet" type="text/css" href="{% static 'css/calendar_style.css' %}"> -->
+      <link rel="stylesheet" type="text/css" href="{% static 'css/calendar.css' %}" />
+      <title>Schedule Calendar</title>
+  </head>
+  
+  <body>
+      {% block content %}
+      {% endblock %}
+
+
+      {% block script %}
+      {% endblock %}
+      <script src="{% static 'js/calendar.js' %}"></script>
+  </body>
+</html>
